@@ -1,18 +1,8 @@
-import { useEffect, useReducer } from "react";
+import { createContext, useReducer, useEffect, useContext } from "react";
 
-import Header from "./Header";
-import Main from "./Main";
-import Question from "./Question";
-import Progress from "./Progress";
-import NextButton from "./NextButton";
-import Footer from "./Footer";
-import StartScreen from "./StartScreen";
-import FinishScreen from "./FinishScreen";
-import Timer from "./Timer";
-import Loader from "./Loader";
-import Error from "./Error";
-
-const SEC_PER_QUES = 5;
+const QuizContext = createContext();
+const BASE_URL = "http://localhost:8000";
+const SEC_PER_QUES = 6;
 
 const initialState = {
   questions: [],
@@ -94,11 +84,12 @@ function reducer(state, action) {
   }
 }
 
-function App() {
+function QuizProvider({ children }) {
   const [
     { questions, status, index, answer, points, highscore, secondsRemaining },
     dispatch,
   ] = useReducer(reducer, initialState);
+
   const numQuestions = questions.length;
   const maxmPossiblePoints = questions.reduce(
     (acc, question) => acc + question.points,
@@ -108,7 +99,7 @@ function App() {
   useEffect(function () {
     async function getQuestions() {
       try {
-        const res = await fetch("http://localhost:8000/questions");
+        const res = await fetch(`${BASE_URL}/questions`);
         if (!res.ok) throw new Error("Error in fetching the questions.");
 
         const data = await res.json();
@@ -122,49 +113,31 @@ function App() {
   }, []);
 
   return (
-    <div className="app">
-      <Header />
-      <Main>
-        {status === "loading" && <Loader />}
-        {status === "error" && <Error />}
-        {status === "ready" && (
-          <StartScreen numQuestions={numQuestions} dispatch={dispatch} />
-        )}
-        {status === "active" && (
-          <>
-            <Progress
-              index={index}
-              numQuestions={numQuestions}
-              points={points}
-              maxmPossiblePoints={maxmPossiblePoints}
-            />
-            <Question
-              question={questions[index]}
-              dispatch={dispatch}
-              answer={answer}
-            />
-            <Footer>
-              <Timer secondsRemaining={secondsRemaining} dispatch={dispatch} />
-              <NextButton
-                dispatch={dispatch}
-                answer={answer}
-                index={index}
-                numQuestions={numQuestions}
-              />
-            </Footer>
-          </>
-        )}
-        {status === "finished" && (
-          <FinishScreen
-            points={points}
-            maxmPossiblePoints={maxmPossiblePoints}
-            highscore={highscore}
-            dispatch={dispatch}
-          />
-        )}
-      </Main>
-    </div>
+    <QuizContext.Provider
+      value={{
+        questions,
+        status,
+        index,
+        answer,
+        points,
+        highscore,
+        secondsRemaining,
+        numQuestions,
+        maxmPossiblePoints,
+
+        dispatch,
+      }}
+    >
+      {children}
+    </QuizContext.Provider>
   );
 }
 
-export default App;
+function useQuiz() {
+  const context = useContext(QuizContext);
+  if (context === undefined)
+    throw new Error("QuizContext was used outside the QuizProvider");
+  return context;
+}
+
+export { QuizProvider, useQuiz };
