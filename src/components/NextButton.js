@@ -1,5 +1,3 @@
-import React from "react";
-
 function NextButton({ dispatch, answer, index, numQuestions }) {
   if (answer === null) return null;
   if (index + 1 < numQuestions)

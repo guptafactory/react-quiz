@@ -1,4 +1,5 @@
 import { useEffect, useReducer } from "react";
+
 import Header from "./Header";
 import Main from "./Main";
 import Loader from "./Loader";
@@ -10,7 +11,9 @@ import Timer from "./Timer";
 import NextButton from "./NextButton";
 import FinishScreen from "./FinishScreen";
 import Footer from "./Footer";
+
 const SEC_PER_QUES = 5;
+
 const initialState = {
   questions: [],
   // "loading", "error", "ready", "active", "finished"
@@ -19,8 +22,9 @@ const initialState = {
   answer: null, // user selected option - Not actual correct option
   points: 0,
   highscore: 0,
-  secondsRemaining: null,
+  secondsRemaining: SEC_PER_QUES,
 };
+
 function reducer(state, action) {
   switch (action.type) {
     case "dataReceived":
@@ -30,13 +34,20 @@ function reducer(state, action) {
         status: "ready",
         secondsRemaining: state.questions.length * SEC_PER_QUES,
       };
+
     case "dataFailed":
       return {
         ...state,
         status: "error",
       };
+
     case "start":
-      return { ...state, status: "active" };
+      return {
+        ...state,
+        status: "active",
+        secondsRemaining: state.questions.length * SEC_PER_QUES,
+      };
+
     case "newAnswer":
       const question = state.questions.at(state.index);
       return {
@@ -47,12 +58,14 @@ function reducer(state, action) {
             ? state.points + question.points
             : state.points,
       };
+
     case "nextQuestion":
       return {
         ...state,
         index: state.index++,
         answer: null,
       };
+
     case "restart":
       return {
         ...initialState,
@@ -61,12 +74,14 @@ function reducer(state, action) {
         answer: null,
         highscore: Math.max(state.highscore, state.points),
       };
+
     case "tick":
       return {
         ...state,
         secondsRemaining: state.secondsRemaining--,
         status: state.secondsRemaining <= 0 ? "finished" : state.status,
       };
+
     case "endQuiz":
       return {
         ...state,
@@ -74,10 +89,12 @@ function reducer(state, action) {
         status: "finished",
         highscore: Math.max(state.highscore, state.points),
       };
+
     default:
       throw new Error("Unknown action");
   }
 }
+
 function App() {
   const [
     { questions, status, index, answer, points, highscore, secondsRemaining },
@@ -88,6 +105,7 @@ function App() {
     (acc, question) => acc + question.points,
     0
   );
+
   useEffect(function () {
     async function getQuestions() {
       try {
@@ -102,6 +120,7 @@ function App() {
     }
     getQuestions();
   }, []);
+
   return (
     <div className="app">
       <Header />

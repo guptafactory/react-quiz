@@ -1,5 +1,3 @@
-import React from "react";
-
 function Progress({ index, numQuestions, points, maxmPossiblePoints, answer }) {
   return (
     <header className="progress">

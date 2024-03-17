@@ -2,6 +2,7 @@ import React from "react";
 
 function FinishScreen({ points, maxmPossiblePoints, highscore, dispatch }) {
   if (!maxmPossiblePoints) throw new Error("Max score not provided");
+
   const percentage = Math.ceil((points / maxmPossiblePoints) * 100);
   const emoji =
     percentage === 100
@@ -13,6 +14,7 @@ function FinishScreen({ points, maxmPossiblePoints, highscore, dispatch }) {
       : percentage > 0
       ? "🤔"
       : "🤦‍♂️";
+
   return (
     <>
       <p className="result">

@@ -3,6 +3,7 @@ import React from "react";
 function Options({ question, dispatch, answer }) {
   // answer is => user selected option - Not actual correct option
   const hasAnswered = answer !== null;
+
   return (
     <div className="options">
       {question.options.map((option, index) => (
