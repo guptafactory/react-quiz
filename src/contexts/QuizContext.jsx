@@ -1,7 +1,7 @@
 import { createContext, useReducer, useEffect, useContext } from "react";
 
 const QuizContext = createContext();
-const BASE_URL = "https://api.jsonserve.com/xuVmCB";
+const BASE_URL = "http://localhost:8000";
 const SEC_PER_QUES = 6;
 
 const initialState = {
@@ -99,7 +99,7 @@ function QuizProvider({ children }) {
   useEffect(function () {
     async function getQuestions() {
       try {
-        const res = await fetch(`${BASE_URL}`);
+        const res = await fetch(`${BASE_URL}/questions`);
         if (!res.ok) throw new Error("Error in fetching the questions.");
 
         const data = await res.json();
