@@ -103,6 +103,8 @@ function QuizProvider({ children }) {
 
         if (!res.ok) throw new Error("Error in fetching the questions.");
         const data = await res.json();
+        console.log(data);
+
         dispatch({ type: "dataReceived", payload: data.questions });
       } catch (err) {
         dispatch({ type: "dataFailed", payload: err.message });
